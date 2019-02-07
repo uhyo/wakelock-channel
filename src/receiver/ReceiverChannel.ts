@@ -3,6 +3,7 @@ import { ChannelOptions } from '../channel/option';
 export class ReceiverChannel implements IWritableChannel {
   private callback: ((bit: 0 | 1) => void) | null = null;
   private wakelock!: WakeLock;
+  private currentActive: boolean = false;
   static async create(options: ChannelOptions): Promise<ReceiverChannel> {
     const obj = new ReceiverChannel(options);
     await obj.init();
@@ -10,7 +11,16 @@ export class ReceiverChannel implements IWritableChannel {
   }
   private constructor(private options: ChannelOptions) {}
   private async init(): Promise<void> {
-    this.wakelock = await navigator.getWakeLock('screen');
+    this.wakelock = await navigator.getWakeLock(this.options.wakelockType);
+    this.currentActive = this.wakelock.active;
+    this.wakelock.addEventListener('activechange', () => {
+      console.log('activechange', this.currentActive, this.wakelock.active);
+      this.currentActive = this.wakelock.active;
+    });
+    document.addEventListener('visibilitychange', () => {
+      // workaround for chromium bug 929229
+      this.wakelock.createRequest().cancel();
+    });
   }
   public registerTickCallback(f: (bit: 0 | 1) => void) {
     this.callback = f;
@@ -19,9 +29,9 @@ export class ReceiverChannel implements IWritableChannel {
     this.callback = null;
   }
   public frame() {
-    console.log('frame', this.wakelock.active, Date.now());
+    // console.log('frame', this.currentActive, Date.now());
     if (this.callback != null) {
-      this.callback(1);
+      this.callback(Number(!this.currentActive) as 0 | 1);
     }
   }
 }

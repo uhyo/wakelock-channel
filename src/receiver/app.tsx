@@ -7,16 +7,23 @@ import { ReceiverChannel } from './ReceiverChannel';
 export const App = () => {
   React.useEffect(() => {
     const runner = new ReceiverWorker();
-    ReceiverChannel.create(channelOptions).then(channel => {
+    ReceiverChannel.create(channelOptions).then(async channel => {
       const decoder = new Decoder(encoderOptions);
       const receiver = new Receiver(channel, decoder);
       receiver.start();
-      runner.postMessage('run');
+      runner.postMessage({
+        type: 'run',
+        interval: channelOptions.interval,
+        offset: Math.floor(channelOptions.interval / 2),
+      });
       runner.addEventListener('message', ev => {
         if (ev.data === 'timer') {
           channel.frame();
         }
       });
+      for await (const data of receiver.iterateData()) {
+        console.log('received', data);
+      }
     });
     return () => runner.terminate();
   }, []);

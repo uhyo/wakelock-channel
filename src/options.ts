@@ -14,5 +14,6 @@ export const encoderOptions: EncodingOptions = {
  * Options for channel.
  */
 export const channelOptions: ChannelOptions = {
+  wakelockType: 'system',
   interval: 100,
 };
