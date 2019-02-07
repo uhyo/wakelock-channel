@@ -1,12 +1,12 @@
 import * as React from 'react';
-import ReceiverWorker from 'worker-loader!./timer.worker.ts';
+import TimerWorker from 'worker-loader!../timer-worker/index.worker.ts';
 import { Decoder, Receiver } from 'my-serial-encoding';
 import { channelOptions, encoderOptions } from '../options';
-import { ReceiverChannel } from './ReceiverChannel';
+import { ReceiverChannel } from '../channel/ReceiverChannel';
 
 export const App = () => {
   React.useEffect(() => {
-    const runner = new ReceiverWorker();
+    const runner = new TimerWorker();
     ReceiverChannel.create(channelOptions).then(async channel => {
       const decoder = new Decoder(encoderOptions);
       const receiver = new Receiver(channel, decoder);

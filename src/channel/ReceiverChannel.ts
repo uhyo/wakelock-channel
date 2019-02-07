@@ -1,6 +1,6 @@
-import { IWritableChannel } from 'my-serial-encoding';
-import { ChannelOptions } from '../channel/option';
-export class ReceiverChannel implements IWritableChannel {
+import { IReadableChannel } from 'my-serial-encoding';
+import { ChannelOptions } from './option';
+export class ReceiverChannel implements IReadableChannel {
   private callback: ((bit: 0 | 1) => void) | null = null;
   private wakelock!: WakeLock;
   private currentActive: boolean = false;

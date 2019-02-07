@@ -13,6 +13,10 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       title: 'WakeLock connection receiver',
+      filename: 'receiver.html',
+    }),
+    new HtmlWebpackPlugin({
+      title: 'WakeLock connection sender',
       filename: 'index.html',
     }),
   ],
